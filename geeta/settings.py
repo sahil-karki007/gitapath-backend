@@ -82,14 +82,27 @@ WSGI_APPLICATION = 'geeta.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Parse DATABASE_URL manually
+db_url = os.environ.get('DATABASE_URL', '')
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/gitapath_db'),
-        conn_max_age=600,
-        ssl_require=False,
-    )
-}
+if db_url:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.parse(db_url, conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'gitapath_db',
+            'USER': 'postgres',
+            'PASSWORD': 'your_password_here',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
+
+
 
 
 # Password validation
