@@ -1,1 +1,1 @@
-web: gunicorn geeta.wsgi --log-file -
+web: /opt/venv/bin/python manage.py migrate && gunicorn geeta.wsgi --log-file -
