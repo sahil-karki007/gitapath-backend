@@ -1,0 +1,1 @@
+web: gunicorn geeta.wsgi --log-file -
