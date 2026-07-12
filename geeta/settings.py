@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 # Load environment variables from .env file
 load_dotenv()
@@ -81,16 +82,24 @@ WSGI_APPLICATION = 'geeta.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'geeta_db',
-        'USER': 'postgres',
-        'PASSWORD': 'sahil@2003',
-        'HOST': 'localhost',
-        'PORT': '5432',
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'gitapath_db',
+            'USER': 'postgres',
+            'PASSWORD': 'your_password_here',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 
 # Password validation
