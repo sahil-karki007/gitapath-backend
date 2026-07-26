@@ -10,6 +10,11 @@ from .serializers import (
     ChapterListSerializer, VerseSerializer, UserProgressSerializer,
     BookmarkSerializer, LastReadSerializer
 )
+from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+import os
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -141,3 +146,67 @@ def unmark_chapter_complete(request, chapter_number):
         return Response({'message': 'Chapter unmarked'})
     except Chapter.DoesNotExist:
         return Response({'error': 'Chapter not found'}, status=status.HTTP_404_NOT_FOUND)    
+
+
+# ✅ Forgot Password — email bhejo
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def forgot_password(request):
+    email = request.data.get('email')
+    if not email:
+        return Response({'error': 'Email required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(email=email)
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        
+        frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+        reset_link = f"{frontend_url}/reset-password/{uid}/{token}"
+        
+        send_mail(
+            subject='GitaPath — Password Reset 🕉️',
+            message=f'''Jai Shri Krishna! 🙏
+
+Tumne GitaPath pe password reset request ki hai.
+
+Naya password set karne ke liye neeche diye link pe click karo:
+
+{reset_link}
+
+Ye link sirf 24 ghante valid rahega.
+
+Agar tumne ye request nahi ki toh ignore karo.
+
+🌿 GitaPath Team''',
+            from_email='GitaPath <mystoganoo7oo@gmail.com>',
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        return Response({'message': 'Password reset email bhej diya gaya!'})
+    except User.DoesNotExist:
+        return Response({'message': 'Password reset email bhej diya gaya!'})
+
+# ✅ Reset Password — naya password set karo
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reset_password(request):
+    uid = request.data.get('uid')
+    token = request.data.get('token')
+    new_password = request.data.get('new_password')
+    
+    if not all([uid, token, new_password]):
+        return Response({'error': 'Sab fields required hain'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user_id = force_str(urlsafe_base64_decode(uid))
+        user = User.objects.get(pk=user_id)
+        
+        if default_token_generator.check_token(user, token):
+            user.set_password(new_password)
+            user.save()
+            return Response({'message': 'Password successfully reset ho gaya!'})
+        else:
+            return Response({'error': 'Invalid ya expired link'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception:
+        return Response({'error': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)    

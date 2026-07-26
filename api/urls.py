@@ -30,4 +30,6 @@ urlpatterns = [
     path('last-read/<int:verse_id>/update/', views.update_last_read, name='update_last_read'),
 
     path('progress/<int:chapter_number>/uncomplete/', views.unmark_chapter_complete, name='unmark_complete'),
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('reset-password/', views.reset_password, name='reset_password'),
 ]
