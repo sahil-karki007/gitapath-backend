@@ -163,26 +163,29 @@ def forgot_password(request):
         
         frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
         reset_link = f"{frontend_url}/reset-password/{uid}/{token}"
-        
-        send_mail(
-            subject='GitaPath — Password Reset 🕉️',
-            message=f'''Jai Shri Krishna! 🙏
 
-Tumne GitaPath pe password reset request ki hai.
+        import resend
+        resend.api_key = os.environ.get('RESEND_API_KEY')
 
-Naya password set karne ke liye neeche diye link pe click karo:
-
-{reset_link}
-
-Ye link sirf 24 ghante valid rahega.
-
-Agar tumne ye request nahi ki toh ignore karo.
-
-🌿 GitaPath Team''',
-            from_email='GitaPath <mystoganoo7oo@gmail.com>',
-            recipient_list=[email],
-            fail_silently=False,
-        )
+        resend.Emails.send({
+            "from": "GitaPath <onboarding@resend.dev>",
+            "to": [email],
+            "subject": "GitaPath — Password Reset 🕉️",
+            "html": f"""
+                <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
+                    <h2>🕉️ Jai Shri Krishna!</h2>
+                    <p>Tumne GitaPath pe password reset request ki hai.</p>
+                    <p>Naya password set karne ke liye neeche button pe click karo:</p>
+                    <a href="{reset_link}" style="display: inline-block; padding: 12px 24px; background: #2d5a3d; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 16px 0;">
+                        Password Reset Karo 🔑
+                    </a>
+                    <p style="color: #666; font-size: 13px;">Ye link sirf 24 ghante valid rahega.</p>
+                    <p style="color: #666; font-size: 13px;">Agar tumne ye request nahi ki toh ignore karo.</p>
+                    <hr/>
+                    <p style="color: #999; font-size: 12px;">🌿 GitaPath Team</p>
+                </div>
+            """
+        })
         return Response({'message': 'Password reset email bhej diya gaya!'})
     except User.DoesNotExist:
         return Response({'message': 'Password reset email bhej diya gaya!'})

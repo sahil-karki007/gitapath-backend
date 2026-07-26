@@ -8,3 +8,4 @@ gunicorn
 whitenoise
 requests
 dj-database-url
+resend
