@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-_@$r9sdo($ecxr1pr4-)shfb4_alu0v-_i$dp861im%*s0h&2@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['gitapath-backend-production.up.railway.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
