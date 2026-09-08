@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
+from datetime import timedelta
 
 # Load environment variables from .env file
 load_dotenv()
@@ -152,8 +153,9 @@ REST_FRAMEWORK = {
     ),
 }
 
-from datetime import timedelta
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=4),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
 }
